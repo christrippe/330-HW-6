@@ -1,0 +1,81 @@
+---
+title: "330-HW-6"
+author: "Chris Trippe"
+date: "11/8/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r, message = FALSE, echo = FALSE}
+library(tidyverse)
+library(MASS)
+library(lmtest)
+library(bestglm)
+library(GGally)
+library(car)
+library(ggcorrplot)
+```
+
+1. In your own words, summarize the overarching problem and any specific questions that need to be answered
+using the rating dataset. Discuss how statistical modeling will be able to answer the posed questions.
+
+In order to know what makes a good professor, we will make a regression model by examining nine different variables (number of years the professor has been teaching, number of courses taught by professor, is the professor "hot, the professor's discipline, average easiness rating of the professor, etc.) from ratemyprofessor.com and determine which, if any, contribute to a professor's overall quality. 
+
+2. Construct a scatterplot matrix of the data and assess any potential issues related to collinearity. Calculate
+variance inflation factors and discuss what variables, if any, are collinear. Comment on what affect collinearity
+can have on a regression analysis.
+
+```{r, message = FALSE}
+prof_data <- read.table(file ="rateprof.txt", header = TRUE)
+ggpairs(prof_data[,c(2,3,4,6,7,8)])
+```
+
+```{r}
+cor(prof_data[,c(2,3,4,6,7,8)])
+```
+
+```{r}
+slr_prof <- lm(quality~.,prof_data)
+vif(slr_prof)[vif(slr_prof) > 10]
+```
+
+
+3. Use a variable selection technique to determine a MLR model that will answer the questions posed in #1 (do
+NOT consider any interactions). Justify your choice of your selected variable selection procedure (e.g., state
+why you chose to use backward instead of forward selection). Justify your choice of a model comparison
+criterion (e.g. state why you chose to base your variable selection procedure on AIC vs. BIC).
+
+```{r}
+vs.res <- bestglm(slr_profy, IC = "AIC", method = "exhaustive")
+
+vs.res$BestModel
+```
+
+
+4. Write out (in mathematical form with greek letters) your selected MLR model from #3. Clearly state any
+assumptions you are using in your model. Provide an interpretation of each mathematical term (variable or
+parameter) included in your model. Using the mathematical form, discuss how your model, after fitting it to
+the data, will be able to answer the questions in this problem.
+
+
+
+5. Fit your model in #3 to the professor rating data and summarize the results by displaying the estimated coefficients
+in a table with 95% confidence intervals for each parameter. Provide an example of how to interpret
+1 interval for a quantitative explanatory variable and 1 interval for a categorical explanatory variable correctly
+in the context of the problem.
+
+
+
+6. Assess the fit of your model and justify your model assumptions using appropriate graphics or summary
+statistics. Provide discussion of your assessment of the model fit and assumptions on the level of your target
+audience (e.g. interpret your model R2).
+
+
+
+7. Provide a discussion to an incoming BYU professor about important qualities of a good professor (according
+to rate my professor anway). As an example, use your model to predict (and show a corresponding 95% prediction
+interval) Dr. Heaton’s quality rating score given: numYears= 5, numRaters= 54, numCourses= 2,
+pepper=no (§ - at least my wife thinks I’m cute) , discipline=STEM, dept=Math, easiness= 2.5,
+raterInterest= 4.2.
