@@ -16,6 +16,9 @@ library(bestglm)
 library(GGally)
 library(car)
 library(ggcorrplot)
+library(knitr)
+library(kableExtra)
+library(dplyr)
 ```
 
 1. In your own words, summarize the overarching problem and any specific questions that need to be answered
@@ -27,17 +30,33 @@ In order to know what makes a good professor, we will make a regression model by
 variance inflation factors and discuss what variables, if any, are collinear. Comment on what affect collinearity
 can have on a regression analysis.
 
-```{r, message = FALSE}
+```{r, message = FALSE, echo = FALSE}
+##Read in table
 prof_data <- read.table(file ="rateprof.txt", header = TRUE)
-ggpairs(prof_data[,c(2,3,4,6,7,8)])
+
+##Data subset with quantitative variables
+prof_quant <- prof_data[,sapply(prof_data,is.numeric)]
+
+##scatter plot matrix with correlations
+ggpairs(prof_quant)
 ```
 
-```{r}
-cor(prof_data[,c(2,3,4,6,7,8)])
-```
 
-```{r}
+```{r, echo = FALSE}
+##Linear Model with all variables
 slr_prof <- lm(quality~.,prof_data)
+vif_prof <- vif(slr_prof)
+vif_prof <- data.frame(vif(slr_prof))
+colnames(vif_prof) <- "VIF"
+vif_prof <- as.matrix(cbind(Varibles = row.names(vif_prof), VIF = vif_prof$VIF))
+
+##Calculate variance inflation factors
+kable(cbind(vif_prof[1:10,], vif_prof[11:20,], vif_prof[21:30,])) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+```
+
+```{r, echo = FALSE}
+##Calculate variance inflation factors > 10
 vif(slr_prof)[vif(slr_prof) > 10]
 ```
 
@@ -48,17 +67,25 @@ why you chose to use backward instead of forward selection). Justify your choice
 criterion (e.g. state why you chose to base your variable selection procedure on AIC vs. BIC).
 
 ```{r}
-vs.res <- bestglm(slr_profy, IC = "AIC", method = "exhaustive")
+prof_data <- prof_data[,c(1:7,9:ncol(prof_data),8)]
 
-vs.res$BestModel
+vs.res <- bestglm(prof_data, IC = "AIC", method = "exhaustive")
+
+slr_best <- vs.res$BestModel
+
+slr_best
 ```
 
+$y_i = \beta_0 + \beta_1numYears_i + \beta_2numCourses_i + \beta_3I(pepperyes_i = yes) + \beta_4easiness_i + \beta_5raterInterest_i + \beta_6I(disciplineSTEMYes_i = yes) + \beta_7I(deptBusinessYes_i = yes) + \beta_8I(deptEnglishYes_i = yes) + \beta_9I(deptGeologyYes_i = yes) + \beta_{10}I(deptLanguagesYes_i = yes) + \beta_{11}I(deptPhysicsYes_i = yes) + \beta{12}I(deptPolySciYes = yes) + \beta_{13}I(deptPsychologyYes_i = yes)$
 
 4. Write out (in mathematical form with greek letters) your selected MLR model from #3. Clearly state any
 assumptions you are using in your model. Provide an interpretation of each mathematical term (variable or
 parameter) included in your model. Using the mathematical form, discuss how your model, after fitting it to
 the data, will be able to answer the questions in this problem.
 
+```{r}
+
+```
 
 
 5. Fit your model in #3 to the professor rating data and summarize the results by displaying the estimated coefficients
@@ -66,12 +93,30 @@ in a table with 95% confidence intervals for each parameter. Provide an example 
 1 interval for a quantitative explanatory variable and 1 interval for a categorical explanatory variable correctly
 in the context of the problem.
 
+```{r}
+
+```
+
 
 
 6. Assess the fit of your model and justify your model assumptions using appropriate graphics or summary
 statistics. Provide discussion of your assessment of the model fit and assumptions on the level of your target
 audience (e.g. interpret your model R2).
 
+```{r}
+#testing for linearity
+avPlot(slr_best, variable = "numYears")
+avPlot(slr_best, variable = "numCourses")
+avPlot(slr_best, variable = "easiness")
+avPlot(slr_best, variable = "raterInterest")
+
+##testing for normality
+ks.test(stdres(slr_best),"pnorm")
+
+##testing for equal variance
+bptest(slr_best)
+
+```
 
 
 7. Provide a discussion to an incoming BYU professor about important qualities of a good professor (according
@@ -79,3 +124,4 @@ to rate my professor anway). As an example, use your model to predict (and show 
 interval) Dr. Heaton’s quality rating score given: numYears= 5, numRaters= 54, numCourses= 2,
 pepper=no (§ - at least my wife thinks I’m cute) , discipline=STEM, dept=Math, easiness= 2.5,
 raterInterest= 4.2.
+
