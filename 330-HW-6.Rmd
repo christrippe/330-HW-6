@@ -46,7 +46,7 @@ slr_prof <- lm(quality~.,prof_data)
 vif_prof <- vif(slr_prof)
 vif_prof <- data.frame(vif(slr_prof))
 colnames(vif_prof) <- "VIF"
-vif_prof <- as.matrix(cbind(Varibles = row.names(vif_prof), VIF = vif_prof$VIF))
+vif_prof <- as.matrix(cbind(Varible = row.names(vif_prof), VIF = vif_prof$VIF))
 
 ##Calculate variance inflation factors
 kable(cbind(vif_prof[1:10,], vif_prof[11:20,], vif_prof[21:30,])) %>%
@@ -66,7 +66,7 @@ NOT consider any interactions). Justify your choice of your selected variable se
 why you chose to use backward instead of forward selection). Justify your choice of a model comparison
 criterion (e.g. state why you chose to base your variable selection procedure on AIC vs. BIC).
 
-```{r}
+```{r, echo = FALSE}
 prof_data <- prof_data[,c(1:7,9:ncol(prof_data),8)]
 
 vs.res <- bestglm(prof_data, IC = "AIC", method = "exhaustive")
@@ -81,15 +81,41 @@ assumptions you are using in your model. Provide an interpretation of each mathe
 parameter) included in your model. Using the mathematical form, discuss how your model, after fitting it to
 the data, will be able to answer the questions in this problem.
 
-When using the 
-$y_i = \beta_0 + \beta_1numYears_i + \beta_2numCourses_i + \beta_3I(pepperyes_i = yes) + \beta_4easiness_i + \beta_5raterInterest_i + \beta_6I(disciplineSTEMYes_i = yes) + \beta_7I(deptBusinessYes_i = yes) + \beta_8I(deptEnglishYes_i = yes) + \beta_9I(deptGeologyYes_i = yes) + \beta_{10}I(deptLanguagesYes_i = yes) + \beta_{11}I(deptPhysicsYes_i = yes) + \beta{12}I(deptPolySciYes = yes) + \beta_{13}I(deptPsychologyYes_i = yes)$
+When using an exhaustive AIC variable selection test, the following model is built:
 
+$y_i = \beta_0 + \beta_1numYears_i + \beta_2numCourses_i + \beta_3I(pepperyes_i = yes) + \\ \beta_4easiness_i + \beta_5raterInterest_i + \beta_6I(disciplineSTEMYes_i = yes) + \\ \beta_7I(deptBusinessYes_i = yes) + \beta_8I(deptEnglishYes_i = yes) + \\ \beta_9I(deptGeologyYes_i = yes) + \beta_{10}I(deptLanguagesYes_i = yes) + \beta_{11}I(deptPhysicsYes_i = yes) + \\ \beta{12}I(deptPolySciYes = yes) + \beta_{13}I(deptPsychologyYes_i = yes)$
 
+By using this model, we assume that the model is linear, the values of quality are independent, the residuals are normally distributed about the regression line, and the residuals have equal variance about the line. 
 
-```{r}
+$\beta_{0}$: the intercept; when all categorical variables are "no" and all quantitative variables are 0, the value of quality is $\beta_{0}$, on average.
 
-  
-```
+$\beta_{1}$: Holding all other explanitory variables constant, as the number of years increases by one, quality increases by $\beta_{1}$, on average.
+
+$\beta_{2}$: Holding all other explanitory variables constant, as the number of courses increases by one, quality increases by $\beta_{2}$, on average.
+
+$\beta_{3}$: Holding all other explanitory variables constant, as a review changes from "no" chili pepper to "yes" chili pepper, quality increases by $\beta_{3}$, on average.
+
+$\beta_{4}$: Holding all other explanitory variables constant, as easiness increases by one, quality increases by $\beta_{4}$, on average.
+
+$\beta_{5}$: Holding all other explanitory variables constant, as rater interest increases by one, quality increases by $\beta_{5}$, on average.
+
+$\beta_{6}$: Holding all other explanitory variables constant, as a review changes from "no" discipline STEM to "yes" discipline STEM, quality increases by $\beta_{6}$, on average.
+
+$\beta_{7}$: Holding all other explanitory variables constant, as a review changes from "no" department Business to "yes" department Business, quality increases by $\beta_{7}$, on average.
+
+$\beta_{8}$: Holding all other explanitory variables constant, as a review changes from "no" department English to "yes" department English, quality increases by $\beta_{8}$, on average.
+
+$\beta_{9}$: Holding all other explanitory variables constant, as a review changes from "no" department Geology to "yes" department Geology, quality increases by $\beta_{9}$, on average.
+
+$\beta_{10}$: Holding all other explanitory variables constant, as a review changes from "no" department Longuage to "yes" department Language, quality increases by $\beta_{10}$, on average.
+
+$\beta_{11}$: Holding all other explanitory variables constant, as a review changes from "no" department Physics to "yes" department Physics, quality increases by $\beta_{11}$, on average.
+
+$\beta_{12}$: Holding all other explanitory variables constant, as a review changes from "no" department PolySci to "yes" department PolySci, quality increases by $\beta_{12}$, on average.
+
+$\beta_{13}$: Holding all other explanitory variables constant, as a review changes from "no" department Psychology to "yes" department Psychology, quality increases by $\beta_{13}$, on average.
+
+In order to use this model, the estimated quality value is equal to any of the quantivative values multiplied by their beta or slope value plus the categorical values beta values when that categarical value is "yes".
 
 
 5. Fit your model in #3 to the professor rating data and summarize the results by displaying the estimated coefficients
@@ -97,32 +123,34 @@ in a table with 95% confidence intervals for each parameter. Provide an example 
 1 interval for a quantitative explanatory variable and 1 interval for a categorical explanatory variable correctly
 in the context of the problem.
 
-| Variable                             | Symbol        | Value                         | Variable Type |
-| ------------------------------------ |-------------- | ----------------------------- | --------------|
-| `r names(slr_best$coefficients[1])`  | $\beta_{0}$   | `r slr_best$coefficients[1]`  | Intercept     |
-| `r names(slr_best$coefficients[2])`  | $\beta_{1}$   | `r slr_best$coefficients[2]`  | Quantitative  |
-| `r names(slr_best$coefficients[3])`  | $\beta_{2}$   | `r slr_best$coefficients[3]`  | Quantitative  |
-| `r names(slr_best$coefficients[4])`  | $\beta_{3}$   | `r slr_best$coefficients[4]`  | Qualitative   |
-| `r names(slr_best$coefficients[5])`  | $\beta_{4}$   | `r slr_best$coefficients[5]`  | Quantitative  |
-| `r names(slr_best$coefficients[6])`  | $\beta_{5}$   | `r slr_best$coefficients[6]`  | Quantitative  |
-| `r names(slr_best$coefficients[7])`  | $\beta_{6}$   | `r slr_best$coefficients[7]`  | Qualitative   |
-| `r names(slr_best$coefficients[8])`  | $\beta_{7}$   | `r slr_best$coefficients[8]`  | Qualitative   |
-| `r names(slr_best$coefficients[9])`  | $\beta_{8}$   | `r slr_best$coefficients[9]`  | Qualitative   |
-| `r names(slr_best$coefficients[10])` | $\beta_{9}$   | `r slr_best$coefficients[10]` | Qualitative   |
-| `r names(slr_best$coefficients[11])` | $\beta_{10}$  | `r slr_best$coefficients[11]` | Qualitative   |
-| `r names(slr_best$coefficients[12])` | $\beta_{11}$  | `r slr_best$coefficients[12]` | Qualitative   |
-| `r names(slr_best$coefficients[13])` | $\beta_{12}$  | `r slr_best$coefficients[13]` | Qualitative   |
-| `r names(slr_best$coefficients[14])` | $\beta_{13}$  | `r slr_best$coefficients[14]` | Qualitative   |
+| Variable                             | Symbol        | Estimate                      | Lower Bound                 | Upper Bound
+| ------------------------------------ |-------------- | ----------------------------- | ----------------------------| -------------------------- |
+| `r names(slr_best$coefficients[1])`  | $\beta_{0}$   | `r slr_best$coefficients[1]`  | `r confint(slr_best)[1,1]`  | `r confint(slr_best)[1,2]` |
+| `r names(slr_best$coefficients[2])`  | $\beta_{1}$   | `r slr_best$coefficients[2]`  | `r confint(slr_best)[2,1]`  | `r confint(slr_best)[2,2]` |
+| `r names(slr_best$coefficients[3])`  | $\beta_{2}$   | `r slr_best$coefficients[3]`  | `r confint(slr_best)[3,1]`  | `r confint(slr_best)[3,2]` |
+| `r names(slr_best$coefficients[4])`  | $\beta_{3}$   | `r slr_best$coefficients[4]`  | `r confint(slr_best)[4,1]`  | `r confint(slr_best)[4,2]` |
+| `r names(slr_best$coefficients[5])`  | $\beta_{4}$   | `r slr_best$coefficients[5]`  | `r confint(slr_best)[5,1]`  | `r confint(slr_best)[5,2]` |
+| `r names(slr_best$coefficients[6])`  | $\beta_{5}$   | `r slr_best$coefficients[6]`  | `r confint(slr_best)[6,1]`  | `r confint(slr_best)[6,2]` |
+| `r names(slr_best$coefficients[7])`  | $\beta_{6}$   | `r slr_best$coefficients[7]`  | `r confint(slr_best)[7,1]`  | `r confint(slr_best)[7,2]` |
+| `r names(slr_best$coefficients[8])`  | $\beta_{7}$   | `r slr_best$coefficients[8]`  | `r confint(slr_best)[8,1]`  | `r confint(slr_best)[8,2]` |
+| `r names(slr_best$coefficients[9])`  | $\beta_{8}$   | `r slr_best$coefficients[9]`  | `r confint(slr_best)[9,1]`  | `r confint(slr_best)[9,2]` |
+| `r names(slr_best$coefficients[10])` | $\beta_{9}$   | `r slr_best$coefficients[10]` | `r confint(slr_best)[10,1]` | `r confint(slr_best)[10,2]`|
+| `r names(slr_best$coefficients[11])` | $\beta_{10}$  | `r slr_best$coefficients[11]` | `r confint(slr_best)[11,1]` | `r confint(slr_best)[11,2]`|
+| `r names(slr_best$coefficients[12])` | $\beta_{11}$  | `r slr_best$coefficients[12]` | `r confint(slr_best)[12,1]` | `r confint(slr_best)[12,2]`|
+| `r names(slr_best$coefficients[13])` | $\beta_{12}$  | `r slr_best$coefficients[13]` | `r confint(slr_best)[13,1]` | `r confint(slr_best)[13,2]`|
+| `r names(slr_best$coefficients[14])` | $\beta_{13}$  | `r slr_best$coefficients[14]` | `r confint(slr_best)[14,1]` | `r confint(slr_best)[14,2]`|
 
-```{r}
-confint(slr_best)
-```
+$\beta_{0}$: the intercept; when all categorical variables are "no" and all quantitative variables are 0, we are 95% confident that the value of quality is between `r confint(slr_best)[1,1]` and `r confint(slr_best)[1,2]`, on average.
+
+$\beta_{1}$: Holding all other explanitory variables constant, as the number of years increases by one, we are 95% confident that quality increases by between `r confint(slr_best)[2,1]` and `r confint(slr_best)[2,2]`, on average.
+
+$\beta_{3}$: Holding all other explanitory variables constant, as a review changes from "no" chili pepper to "yes" chili pepper, we are 95% confident that quality increases by between `r confint(slr_best)[4,1]` and `r confint(slr_best)[4,2]`, on average.
 
 6. Assess the fit of your model and justify your model assumptions using appropriate graphics or summary
 statistics. Provide discussion of your assessment of the model fit and assumptions on the level of your target
 audience (e.g. interpret your model R2).
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, fig.height = 4, fig.width = 4}
 #testing for linearity
 avPlot(slr_best, variable = "numYears")
 avPlot(slr_best, variable = "numCourses")
@@ -137,10 +165,60 @@ bptest(slr_best)
 
 ```
 
+By looking at the AV Plots, we can see that the model is approximately linear. A line seems to be a reasonable model for the data.
+
+As for normality, the Kolmogorov_Smirnov test, which tests for normality, has a p-value of 0.8535, which means we fail to reject the null hypothesis and conclude that the residuals are normally distributed.
+
+When testing for equal variance, we used the Breusch-Pagan test and obtain a value of 0.1666 which means fail to reject the null hypothesis and conculde that the residuals have equal variance. 
+
+Lastly, we must consider independence of the values of quality each professor receives. One could argue that some students might rate more leniently than others, and if those students take a certain class form a professor in one department, they potentially will not take a the classes from a professor in the same department that teaches similar classes. This, however, and other arguments seem like a stretch and we can assume the effect of one professor's quality rating to be negligable on another professor's quality rating. Therefore, we can assume independence. 
+
+```{r, echo = FALSE}
+# R-squared
+summary(slr_best)$r.squared
+
+# Cross validate
+n.cv <- 500
+n.test <- .1*nrow(prof_data) #10%
+bias <- rep(NA,n.cv)
+rpmse <- rep(NA,n.cv)
+coverage <- rep(NA,n.cv)
+width <- rep(NA,n.cv)
+for(cv in 1:n.cv){
+  
+  test.obs <- sample(nrow(prof_data),n.test)
+  test.set <- prof_data[test.obs,]
+  train.set <- prof_data[-test.obs,]
+  
+  train.lm <- lm(quality~numYears + numCourses + pepper + easiness + raterInterest + disciplineSTEM + deptBusiness + deptEnglish + deptGeology + deptLanguages + deptPhysics + deptPolySci + deptPsychology,data=train.set)
+  test.preds <- predict.lm(train.lm,newdata=test.set,interval="prediction")
+  
+  bias[cv] <- mean(test.preds[,1]-test.set$quality)
+  rpmse[cv] <- sqrt(mean((test.preds[,1]-test.set$quality)^2))
+  coverage[cv] <- mean(test.set$quality > test.preds[,2] & test.set$qualit < test.preds[,3])
+  width[cv] <- mean(test.preds[,3]-test.preds[,2])
+}
+
+mean(bias)
+mean(rpmse)
+mean(coverage)
+mean(width/2)
+```
+
 
 7. Provide a discussion to an incoming BYU professor about important qualities of a good professor (according
 to rate my professor anway). As an example, use your model to predict (and show a corresponding 95% prediction
 interval) Dr. Heaton’s quality rating score given: numYears= 5, numRaters= 54, numCourses= 2,
 pepper=no (§ - at least my wife thinks I’m cute) , discipline=STEM, dept=Math, easiness= 2.5,
 raterInterest= 4.2.
+
+```{r}
+# prediction data frame
+dframe <- data.frame(numYears = 5, numCourses = 2, pepper = "no", easiness = 2.5, raterInterest = 4.2, disciplineSTEM = "Yes", deptBusiness = "No", deptEnglish = "No", deptGeology = "No", deptLanguages = "No", deptPhysics = "No", deptPolySci = "No", deptPsychology = "No")
+
+#predicted value
+predict_values <- predict.lm(slr_best, dframe, interval = "prediction")
+
+predict_values
+```
 
