@@ -16,9 +16,7 @@ library(bestglm)
 library(GGally)
 library(car)
 library(ggcorrplot)
-library(knitr)
 library(kableExtra)
-library(dplyr)
 ```
 
 1. In your own words, summarize the overarching problem and any specific questions that need to be answered
@@ -55,7 +53,9 @@ kable(cbind(vif_prof[1:10,], vif_prof[11:20,], vif_prof[21:30,])) %>%
   kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
 ```
 
-```{r, echo = FALSE}
+When referencing to the scatterplot matrix and associated correlation values, there doesn't appear to be any collinearity or strong relationship between two explanitory variables. The largest correlation is 0.342 between number of years and number of raters, but we'll consider than relationship insignificant enough. When calculating variance inflation factors (VIF), which works for qualitative and quantitative variables, values above ten are considered to be multicollinear. That means that variables that should be significant will not be considered significant because of their relationship with other explanitory variables. For this data set, disciplinePre, disciplineSocSci, disciplineSTEM, deptBiology, deptBusiness, and deptChemistry all have VIFs above ten. 
+
+```{r, echo = FALSE, results = "hide"}
 ##Calculate variance inflation factors > 10
 vif(slr_prof)[vif(slr_prof) > 10]
 ```
@@ -72,19 +72,23 @@ prof_data <- prof_data[,c(1:7,9:ncol(prof_data),8)]
 vs.res <- bestglm(prof_data, IC = "AIC", method = "exhaustive")
 
 slr_best <- vs.res$BestModel
-
-slr_best
 ```
 
-$y_i = \beta_0 + \beta_1numYears_i + \beta_2numCourses_i + \beta_3I(pepperyes_i = yes) + \beta_4easiness_i + \beta_5raterInterest_i + \beta_6I(disciplineSTEMYes_i = yes) + \beta_7I(deptBusinessYes_i = yes) + \beta_8I(deptEnglishYes_i = yes) + \beta_9I(deptGeologyYes_i = yes) + \beta_{10}I(deptLanguagesYes_i = yes) + \beta_{11}I(deptPhysicsYes_i = yes) + \beta{12}I(deptPolySciYes = yes) + \beta_{13}I(deptPsychologyYes_i = yes)$
+We will be using this model to make predictions which means AIC or Akaike Information Criterion, which is less restrictive on the variables allowed in "best" model, is better for making predictions than BIC or Bayesian Informaiton Criterion. The "exhaustive" selection method was also used because it finds the best model for each length one through the total number of variables based on their AIC values, and then of those models, the best is picked. That means every possible model is tested and the one with the best AIC value is chosen.
 
 4. Write out (in mathematical form with greek letters) your selected MLR model from #3. Clearly state any
 assumptions you are using in your model. Provide an interpretation of each mathematical term (variable or
 parameter) included in your model. Using the mathematical form, discuss how your model, after fitting it to
 the data, will be able to answer the questions in this problem.
 
+When using the 
+$y_i = \beta_0 + \beta_1numYears_i + \beta_2numCourses_i + \beta_3I(pepperyes_i = yes) + \beta_4easiness_i + \beta_5raterInterest_i + \beta_6I(disciplineSTEMYes_i = yes) + \beta_7I(deptBusinessYes_i = yes) + \beta_8I(deptEnglishYes_i = yes) + \beta_9I(deptGeologyYes_i = yes) + \beta_{10}I(deptLanguagesYes_i = yes) + \beta_{11}I(deptPhysicsYes_i = yes) + \beta{12}I(deptPolySciYes = yes) + \beta_{13}I(deptPsychologyYes_i = yes)$
+
+
+
 ```{r}
 
+  
 ```
 
 
@@ -93,17 +97,32 @@ in a table with 95% confidence intervals for each parameter. Provide an example 
 1 interval for a quantitative explanatory variable and 1 interval for a categorical explanatory variable correctly
 in the context of the problem.
 
+| Variable                             | Symbol        | Value                         | Variable Type |
+| ------------------------------------ |-------------- | ----------------------------- | --------------|
+| `r names(slr_best$coefficients[1])`  | $\beta_{0}$   | `r slr_best$coefficients[1]`  | Intercept     |
+| `r names(slr_best$coefficients[2])`  | $\beta_{1}$   | `r slr_best$coefficients[2]`  | Quantitative  |
+| `r names(slr_best$coefficients[3])`  | $\beta_{2}$   | `r slr_best$coefficients[3]`  | Quantitative  |
+| `r names(slr_best$coefficients[4])`  | $\beta_{3}$   | `r slr_best$coefficients[4]`  | Qualitative   |
+| `r names(slr_best$coefficients[5])`  | $\beta_{4}$   | `r slr_best$coefficients[5]`  | Quantitative  |
+| `r names(slr_best$coefficients[6])`  | $\beta_{5}$   | `r slr_best$coefficients[6]`  | Quantitative  |
+| `r names(slr_best$coefficients[7])`  | $\beta_{6}$   | `r slr_best$coefficients[7]`  | Qualitative   |
+| `r names(slr_best$coefficients[8])`  | $\beta_{7}$   | `r slr_best$coefficients[8]`  | Qualitative   |
+| `r names(slr_best$coefficients[9])`  | $\beta_{8}$   | `r slr_best$coefficients[9]`  | Qualitative   |
+| `r names(slr_best$coefficients[10])` | $\beta_{9}$   | `r slr_best$coefficients[10]` | Qualitative   |
+| `r names(slr_best$coefficients[11])` | $\beta_{10}$  | `r slr_best$coefficients[11]` | Qualitative   |
+| `r names(slr_best$coefficients[12])` | $\beta_{11}$  | `r slr_best$coefficients[12]` | Qualitative   |
+| `r names(slr_best$coefficients[13])` | $\beta_{12}$  | `r slr_best$coefficients[13]` | Qualitative   |
+| `r names(slr_best$coefficients[14])` | $\beta_{13}$  | `r slr_best$coefficients[14]` | Qualitative   |
+
 ```{r}
-
+confint(slr_best)
 ```
-
-
 
 6. Assess the fit of your model and justify your model assumptions using appropriate graphics or summary
 statistics. Provide discussion of your assessment of the model fit and assumptions on the level of your target
 audience (e.g. interpret your model R2).
 
-```{r}
+```{r, echo = FALSE}
 #testing for linearity
 avPlot(slr_best, variable = "numYears")
 avPlot(slr_best, variable = "numCourses")
