@@ -1,12 +1,11 @@
 ---
-title: "330-HW-6"
-author: "Chris Trippe"
-date: "11/8/2018"
+title: "HW 6"
+author: "Chris Trippe & Ethan Kemeny"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 ```
 ```{r, message = FALSE, echo = FALSE}
 library(tidyverse)
@@ -83,7 +82,7 @@ the data, will be able to answer the questions in this problem.
 
 When using an exhaustive AIC variable selection test, the following model is built:
 
-$y_i = \beta_0 + \beta_1numYears_i + \beta_2numCourses_i + \beta_3I(pepperyes_i = yes) + \\ \beta_4easiness_i + \beta_5raterInterest_i + \beta_6I(disciplineSTEMYes_i = yes) + \\ \beta_7I(deptBusinessYes_i = yes) + \beta_8I(deptEnglishYes_i = yes) + \\ \beta_9I(deptGeologyYes_i = yes) + \beta_{10}I(deptLanguagesYes_i = yes) + \beta_{11}I(deptPhysicsYes_i = yes) + \\ \beta{12}I(deptPolySciYes = yes) + \beta_{13}I(deptPsychologyYes_i = yes)$
+$y_i = \beta_0 + \beta_1numYears_i + \beta_2numCourses_i + \beta_3I(pepperyes_i = yes) + \beta_4easiness_i + \beta_5raterInterest_i + \beta_6I(disciplineSTEMYes_i = yes) + \beta_7I(deptBusinessYes_i = yes) + \beta_8I(deptEnglishYes_i = yes) + \beta_9I(deptGeologyYes_i = yes) + \beta_{10}I(deptLanguagesYes_i = yes) + \beta_{11}I(deptPhysicsYes_i = yes) + \beta{12}I(deptPolySciYes = yes) + \beta_{13}I(deptPsychologyYes_i = yes)$
 
 By using this model, we assume that the model is linear, the values of quality are independent, the residuals are normally distributed about the regression line, and the residuals have equal variance about the line. 
 
@@ -174,8 +173,7 @@ When testing for equal variance, we used the Breusch-Pagan test and obtain a val
 Lastly, we must consider independence of the values of quality each professor receives. One could argue that some students might rate more leniently than others, and if those students take a certain class form a professor in one department, they potentially will not take a the classes from a professor in the same department that teaches similar classes. This, however, and other arguments seem like a stretch and we can assume the effect of one professor's quality rating to be negligable on another professor's quality rating. Therefore, we can assume independence. 
 
 ```{r, echo = FALSE}
-# R-squared
-summary(slr_best)$r.squared
+
 
 # Cross validate
 n.cv <- 500
@@ -199,12 +197,22 @@ for(cv in 1:n.cv){
   width[cv] <- mean(test.preds[,3]-test.preds[,2])
 }
 
-mean(bias)
-mean(rpmse)
-mean(coverage)
-mean(width/2)
+# R-squared
+r2 <- summary(slr_best)$r.squared
+
+bias_mean <- mean(bias)
+rpmse_mean <- mean(rpmse)
+coverage_mean <- mean(coverage)
+width_mean <- mean(width)
+
+#quality value ranges from -3.75 to 2.433 an overal width of 6.18
 ```
 
+Using a cross-validation study of 500 samples we are able to get a sense of how accurate our model is at proffesor ratings.  The bias is `r bias_mean`.  This means our model typically predicts life expectancy  `r bias_mean` above the actual value on average. That value is relatively small so we feel our model isn't very biased. The root prediction mean squared error value of `r rpmse_mean` tells us our predictions miss the mark by an average of `r rpmse_mean`. Even with the response variables being smaller values, a value of `r rpmse_mean` is about 16% of the overal range of the response variable. This is a little on the high side for margin of error, but we feel that our model is accurate enough in its predictions. 
+
+We also wanted to look at our prediction intervals or the low and high end of our estimated values.  The study returned a coverage of `r coverage_mean` which is the percentage of prediction intervals that contain the actual value.  We have a width of `r width_mean`, we can conclude that our prediction intervals are about half the size of the response range.  This means our model will get us close to the proffesor's quality but the width is fairly large given the scale of the data.
+
+The $R^{2}$ for this model is `r r2` this means our model of years, number of courses, pepper, easiness, rater interest, stem discipline, and the selected departments can explain `r r2 * 100`% of the variation in proffesor quality.  This value isn't great but it is considerable.  We feel that our model does an okay job at fitting the data with only about 45% of the variation in rating left unexplained
 
 7. Provide a discussion to an incoming BYU professor about important qualities of a good professor (according
 to rate my professor anway). As an example, use your model to predict (and show a corresponding 95% prediction
@@ -219,6 +227,8 @@ dframe <- data.frame(numYears = 5, numCourses = 2, pepper = "no", easiness = 2.5
 #predicted value
 predict_values <- predict.lm(slr_best, dframe, interval = "prediction")
 
-predict_values
 ```
 
+What makes a good professor according to our data and model is their experience, if they are attractive, how easy they are, what department they are in and how interested the students who rate the proffesors are.  The number of courses seems to hurt how good a proffessor is according to their students.  THis makes sense as the teacher might be constrained time wise and in other ways due to their busyness with other classes and the students might feel a lack of availability from the proffesor.
+
+Using our model we predict that Dr. Heaton would recieve a rating of `r predict_values[1]`.  This is positive so on average we would expect students to think he is a decent proffesor.  However, the prediction interval shows that his true rating could be as low as `r predict_values[2]` or as high as `r predict_values[3]`.  This interval tells us that his rating could be slightly negative or it could be close to the highest rating we have data of.  With this in mind, we would say that Dr. Heaton would be considered a "good" proffesor on average by his students.
