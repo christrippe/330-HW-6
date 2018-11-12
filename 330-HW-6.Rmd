@@ -1,11 +1,16 @@
 ---
 title: "HW 6"
 author: "Chris Trippe & Ethan Kemeny"
-output: html_document
+output:
+  word_document: default
+  html_document: default
+always_allow_html: yes
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(comment = "")
+knitr::opts_chunk$set(message = FALSE)
 ```
 ```{r, message = FALSE, echo = FALSE}
 library(tidyverse)
@@ -39,7 +44,7 @@ ggpairs(prof_quant)
 ```
 
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, results = "hide"}
 ##Linear Model with all variables
 slr_prof <- lm(quality~.,prof_data)
 vif_prof <- vif(slr_prof)
@@ -59,6 +64,10 @@ When referencing to the scatterplot matrix and associated correlation values, th
 vif(slr_prof)[vif(slr_prof) > 10]
 ```
 
+```{r}
+##variance inflation factors
+vif(slr_prof)
+```
 
 3. Use a variable selection technique to determine a MLR model that will answer the questions posed in #1 (do
 NOT consider any interactions). Justify your choice of your selected variable selection procedure (e.g., state
